@@ -1,0 +1,96 @@
+
+{% extends "accounts/base.html" %}
+
+{% block title %}Mon profil | MarketPlace{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+    <div class="mb-4">
+        <span class="badge text-bg-primary">Mon compte</span>
+        <h1 class="h3 fw-bold mt-3">
+            Bonjour {{ user.first_name|default:user.username }} !
+        </h1>
+        <p class="text-secondary">
+            Bienvenue dans votre espace personnel.
+        </p>
+    </div>
+
+    <div class="border rounded-3 p-3 mb-3">
+        <p><strong>Nom d'utilisateur :</strong> {{ user.username }}</p>
+        <p><strong>Prénom :</strong> {{ user.first_name|default:"Non renseigné" }}</p>
+        <p><strong>Nom :</strong> {{ user.last_name|default:"Non renseigné" }}</p>
+        <p><strong>E-mail :</strong> {{ user.email }}</p>
+        <p class="mb-0">
+            <strong>Rôle :</strong> {{ user.get_role_display }}
+        </p>
+    </div>
+
+    
+<a href="{% url 'accounts:edit_profile' %}"
+   class="btn btn-outline-primary w-100 mb-3">
+    <i class="bi bi-pencil-square"></i>
+    Modifier mon profil
+</a>
+
+{% if user.role == "ADMIN" %}
+
+    <div class="alert alert-primary">
+        Vous êtes connecté(e) en tant qu'administrateur.
+        Vous disposez des droits d'administration de MarketPlace.
+    </div>
+
+    {% if user.is_staff %}
+        <a href="{% url 'admin:index' %}"
+           class="btn btn-market w-100 mb-2">
+            Accéder à l'administration
+        </a>
+    {% endif %}
+
+{% elif user.role == "SELLER" %}
+
+    {% if user.seller_status == "PENDING" %}
+        <div class="alert alert-warning">
+            Votre demande de compte vendeur est en attente de validation
+            par l'administrateur.
+        </div>
+
+    {% elif user.seller_status == "REJECTED" %}
+        <div class="alert alert-danger">
+            Votre demande de compte vendeur a été refusée.
+            Veuillez contacter l'administrateur.
+        </div>
+
+    {% elif user.seller_status == "APPROVED" %}
+        <div class="alert alert-success">
+            Votre compte vendeur est approuvé.
+        </div>
+
+        <a href="{% url 'stores:create' %}"
+           class="btn btn-market w-100 mb-2">
+            Créer ma boutique
+        </a>
+
+        <a href="{% url 'stores:my_store' %}"
+           class="btn btn-outline-dark w-100">
+            Voir ma boutique
+        </a>
+    {% endif %}
+
+{% else %}
+
+    <div class="alert alert-light border">
+        Vous êtes connecté(e) en tant que client.
+    </div>
+
+{% endif %}
+
+
+
+    <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger w-100">
+            Se déconnecter
+        </button>
+    </form>
+</div>
+{% endblock %}

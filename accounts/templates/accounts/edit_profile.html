@@ -1,0 +1,53 @@
+
+{% extends "accounts/base.html" %}
+
+{% block title %}Modifier mon profil | MarketPlace{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+
+    <div class="mb-4">
+        <span class="badge text-bg-primary">Mon compte</span>
+        <h1 class="h3 fw-bold mt-3">Modifier mon profil</h1>
+        <p class="text-secondary">
+            Mettez à jour vos informations personnelles.
+        </p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% if field.errors %}
+                    <div class="text-danger small mt-1">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-market w-100 mb-2">
+            Enregistrer les modifications
+        </button>
+
+        <a href="{% url 'accounts:profile' %}"
+           class="btn btn-outline-secondary w-100">
+            Annuler
+        </a>
+    </form>
+
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+
+{% extends "accounts/base.html" %}
+
+{% block title %}Créer ma boutique | MarketPlace{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+    <h1 class="h3 fw-bold mb-2">Créer ma boutique</h1>
+    <p class="text-secondary mb-4">
+        Présentez votre boutique aux clients de MarketPlace.
+    </p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label" for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% for error in field.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-market w-100">
+            Envoyer ma demande
+        </button>
+    </form>
+</div>
+{% endblock %}
