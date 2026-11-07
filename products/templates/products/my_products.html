@@ -1,0 +1,52 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Mes produits | MarketPlace{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+    <h1 class="h3 fw-bold mb-0">Mes produits <span class="text-secondary fs-6">({{ store.name }})</span></h1>
+    <a href="{% url 'products:create' %}" class="btn btn-market">+ Ajouter un produit</a>
+</div>
+
+{% if products %}
+<div class="table-responsive bg-white rounded-3 shadow-sm">
+    <table class="table align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Nom</th>
+                <th>Catégorie</th>
+                <th>Prix</th>
+                <th>Stock</th>
+                <th>Visible</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for product in products %}
+            <tr>
+                <td>
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="" width="56" height="56" style="object-fit: cover;" class="rounded">
+                    {% else %}
+                        <span class="text-secondary small">-</span>
+                    {% endif %}
+                </td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.category.name|default:"-" }}</td>
+                <td>{{ product.price }} DT</td>
+                <td>{{ product.stock }}</td>
+                <td>{% if product.is_active %}Oui{% else %}Non{% endif %}</td>
+                <td class="text-end">
+                    <a href="{% url 'products:update' product.pk %}" class="btn btn-sm btn-outline-primary">Modifier</a>
+                    <a href="{% url 'products:delete' product.pk %}" class="btn btn-sm btn-outline-danger">Supprimer</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+    <div class="alert alert-info">Vous n'avez pas encore de produit. Ajoutez le premier !</div>
+{% endif %}
+{% endblock %}

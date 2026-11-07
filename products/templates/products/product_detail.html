@@ -1,0 +1,118 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}{{ product.name }} | MarketPlace{% endblock %}
+
+{% block content %}
+<a href="{% url 'products:home' %}" class="text-decoration-none d-inline-block mt-4 mb-3">
+    &larr; Retour au catalogue
+</a>
+
+<div class="card border-0 shadow-sm">
+    <div class="row g-0">
+        <div class="col-md-5">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" class="img-fluid rounded-start w-100"
+                     alt="{{ product.name }}" style="max-height: 450px; object-fit: cover;">
+            {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center text-secondary h-100"
+                     style="min-height: 300px;">
+                    Pas d'image
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-7">
+            <div class="card-body p-4">
+                {% if product.category %}
+                    <span class="badge text-bg-light mb-2">{{ product.category.name }}</span>
+                {% endif %}
+                <h1 class="h3 fw-bold">{{ product.name }}</h1>
+                <p class="text-secondary">Vendu par <strong>{{ product.store.name }}</strong></p>
+
+                {% if review_count %}
+                    <p class="mb-2">
+                        <span class="text-warning">★</span>
+                        <strong>{{ avg_rating|floatformat:1 }}</strong>
+                        <span class="text-secondary">({{ review_count }} avis)</span>
+                    </p>
+                {% else %}
+                    <p class="text-secondary small mb-2">Aucun avis pour le moment</p>
+                {% endif %}
+
+                <p class="fs-4 fw-bold">{{ product.price }} DT</p>
+
+                {% if product.stock > 0 %}
+                    <p class="text-success">En stock ({{ product.stock }} disponibles)</p>
+                {% else %}
+                    <p class="text-danger fw-bold">Rupture de stock</p>
+                {% endif %}
+
+                <h2 class="h6 fw-bold mt-4">Description</h2>
+                <p>{{ product.description|linebreaksbr }}</p>
+
+                {% if is_client %}
+                    <form method="post" action="{% url 'products:favorite_toggle' product.pk %}" class="mt-3">
+                        {% csrf_token %}
+                        {% if is_favorite %}
+                            <button type="submit" class="btn btn-danger">♥ Retirer des favoris</button>
+                        {% else %}
+                            <button type="submit" class="btn btn-outline-danger">♡ Ajouter aux favoris</button>
+                        {% endif %}
+                    </form>
+                {% elif not user.is_authenticated %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-danger mt-3">♡ Connectez-vous pour ajouter aux favoris</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="mt-5 mb-5">
+    <h2 class="h4 fw-bold mb-3">Avis des clients</h2>
+
+    {% if is_client %}
+    <div class="bg-white p-4 rounded-3 shadow-sm mb-4">
+        <h3 class="h6 fw-bold mb-3">
+            {% if user_review %}Modifier mon avis{% else %}Donner mon avis{% endif %}
+        </h3>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in review_form %}
+                <div class="mb-3">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-market">Publier</button>
+        </form>
+
+        {% if user_review %}
+            <form method="post" action="{% url 'products:review_delete' user_review.pk %}" class="mt-2">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer mon avis</button>
+            </form>
+        {% endif %}
+    </div>
+    {% elif not user.is_authenticated %}
+        <div class="alert alert-light border">
+            <a href="{% url 'accounts:login' %}">Connectez-vous</a> en tant que client pour laisser un avis.
+        </div>
+    {% endif %}
+
+    {% for review in reviews %}
+        <div class="bg-white p-3 rounded-3 shadow-sm mb-3">
+            <div class="d-flex justify-content-between">
+                <strong>{{ review.user.first_name|default:review.user.username }}</strong>
+                <span class="text-warning">{% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</span>
+            </div>
+            {% if review.comment %}<p class="mb-1 mt-2">{{ review.comment|linebreaksbr }}</p>{% endif %}
+            <small class="text-secondary">{{ review.created_at|date:"d/m/Y" }}</small>
+        </div>
+    {% empty %}
+        <p class="text-secondary">Soyez le premier à donner votre avis.</p>
+    {% endfor %}
+</section>
+{% endblock %}
