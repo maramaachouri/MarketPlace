@@ -1,0 +1,43 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Mes favoris | MarketPlace{% endblock %}
+
+{% block content %}
+<h1 class="h3 fw-bold mt-4 mb-4">Mes favoris</h1>
+
+{% if favorites %}
+<div class="row g-4">
+    {% for favorite in favorites %}
+    {% with product=favorite.product %}
+    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+        <div class="card h-100 shadow-sm border-0">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
+                     style="height: 200px; object-fit: cover;">
+            {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center text-secondary"
+                     style="height: 200px;">Pas d'image</div>
+            {% endif %}
+
+            <div class="card-body">
+                <h2 class="h6 fw-bold">
+                    <a href="{% url 'products:detail' product.pk %}" class="text-dark text-decoration-none">{{ product.name }}</a>
+                </h2>
+                <p class="text-secondary small mb-1">Par {{ product.store.name }}</p>
+                <p class="fw-bold">{{ product.price }} DT</p>
+
+                <form method="post" action="{% url 'products:favorite_toggle' product.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'products:favorites' %}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Retirer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endwith %}
+    {% endfor %}
+</div>
+{% else %}
+    <div class="alert alert-info">Vous n'avez aucun favori pour le moment.</div>
+{% endif %}
+{% endblock %}

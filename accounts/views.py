@@ -9,7 +9,7 @@ from .forms import RegisterForm, LoginForm, ProfileUpdateForm
 
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect("accounts:profile")
+        return redirect("products:home")
 
     if request.method == "POST":
         form = RegisterForm(request.POST)
@@ -33,7 +33,7 @@ def register_view(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect("accounts:profile")
+        return redirect("products:home")
 
     if request.method == "POST":
         form = LoginForm(request, data=request.POST)
@@ -45,7 +45,7 @@ def login_view(request):
                 request,
                 f"Bienvenue {user.first_name or user.username} !"
             )
-            return redirect("accounts:profile")
+            return redirect("products:home")
     else:
         form = LoginForm(request)
 

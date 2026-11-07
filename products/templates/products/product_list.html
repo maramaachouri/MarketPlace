@@ -8,6 +8,10 @@
     {% if user.is_authenticated and user.role == "SELLER" %}
         <a href="{% url 'products:my_products' %}" class="btn btn-outline-dark btn-sm">Gérer mes produits</a>
     {% endif %}
+
+        {% if user.is_authenticated and user.role == "CLIENT" %}
+        <a href="{% url 'products:favorites' %}" class="btn btn-outline-danger btn-sm">♥ Mes favoris</a>
+    {% endif %}
 </div>
 
 <form method="get" class="bg-white p-3 rounded-3 shadow-sm mb-4">
@@ -55,6 +59,9 @@
                  <a href="{% url 'products:detail' product.pk %}" class="text-dark text-decoration-none stretched-link">{{ product.name }}</a>
                 </h2>
                 <p class="text-secondary small mb-1">Par {{ product.store.name }}</p>
+                                {% if product.review_count %}
+                    <p class="small mb-1"><span class="text-warning">★</span> {{ product.avg_rating|floatformat:1 }} <span class="text-secondary">({{ product.review_count }})</span></p>
+                {% endif %}
                 <p class="fw-bold mb-0">{{ product.price }} DT</p>
 
                 {% if product.stock == 0 %}

@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Category, Product
+from .models import Category, Product, Review
 
 
 class ProductForm(forms.ModelForm):
@@ -78,3 +78,20 @@ class ProductFilterForm(forms.Form):
         if min_price is not None and max_price is not None and min_price > max_price:
             raise forms.ValidationError("Le prix min ne peut pas dépasser le prix max.")
         return cleaned
+
+
+class ReviewForm(forms.ModelForm):
+    """Formulaire d'avis : note de 1 à 5 + commentaire."""
+
+    class Meta:
+        model = Review
+        fields = ["rating", "comment"]
+        labels = {"rating": "Votre note", "comment": "Votre commentaire"}
+        widgets = {
+            "rating": forms.Select(attrs={"class": "form-select"}),
+            "comment": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": "Partagez votre expérience (facultatif)",
+            }),
+        }
