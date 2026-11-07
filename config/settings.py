@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # Applications du projet MarketPlace
     'accounts',
     'stores',
+    'products',
 ]
 
 MIDDLEWARE = [
